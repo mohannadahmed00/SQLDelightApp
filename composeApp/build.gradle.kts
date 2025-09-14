@@ -26,17 +26,6 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-
-            val dbFile = file("src/commonMain/resources/hafs_smart_v8.db")
-            if (dbFile.exists()) {
-                embedBitcodeMode = org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode.BITCODE
-                freeCompilerArgs += listOf(
-                    "-linker-option",
-                    "-framework",
-                    "-linker-option",
-                    "Foundation"
-                )
-            }
         }
     }
 
@@ -64,16 +53,6 @@ kotlin {
             implementation(libs.sqldelight.native)
         }
     }
-}
-
-tasks.register<Copy>("copyDatabaseToIosResources") {
-    from("src/commonMain/resources/hafs_smart_v8.db")
-    into("src/iosMain/resources")
-    include("hafs_smart_v8.db")
-}
-
-tasks.matching { it.name.contains("linkDebugFrameworkIos") }.configureEach {
-    dependsOn("copyDatabaseToIosResources")
 }
 
 sqldelight {
