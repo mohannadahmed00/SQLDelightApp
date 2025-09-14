@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS ayat (
+    id INTEGER PRIMARY KEY,
+    jozz INTEGER NOT NULL,
+    sura_no INTEGER NOT NULL,
+    sura_name_en TEXT NOT NULL,
+    sura_name_ar TEXT NOT NULL,
+    page INTEGER NOT NULL,
+    line_start INTEGER NOT NULL,
+    line_end INTEGER NOT NULL,
+    aya_no INTEGER NOT NULL,
+    aya_text TEXT NOT NULL,
+    aya_text_emlaey TEXT NOT NULL
+);
+
+-- Queries
+getAyatBySuraNo:
+SELECT * FROM ayat WHERE sura_no = :suraNo;
+
+getAllAyat:
+SELECT * FROM ayat;
+
+getAyaById:
+SELECT * FROM ayat WHERE id = :id;
+
+getAyatBySuraAndAyaNo:
+SELECT * FROM ayat WHERE sura_no = :suraNo AND aya_no = :ayaNo;

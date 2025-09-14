@@ -1,4 +1,6 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,6 +8,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.sqlDelight)
 }
 
 kotlin {
@@ -14,21 +17,34 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
+        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+
+            val dbFile = file("src/commonMain/resources/hafs_smart_v8.db")
+            if (dbFile.exists()) {
+                embedBitcodeMode = org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode.BITCODE
+                freeCompilerArgs += listOf(
+                    "-linker-option",
+                    "-framework",
+                    "-linker-option",
+                    "Foundation"
+                )
+            }
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.sqldelight.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -39,9 +55,32 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.sqldelight.coroutines)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native)
+        }
+    }
+}
+
+tasks.register<Copy>("copyDatabaseToIosResources") {
+    from("src/commonMain/resources/hafs_smart_v8.db")
+    into("src/iosMain/resources")
+    include("hafs_smart_v8.db")
+}
+
+tasks.matching { it.name.contains("linkDebugFrameworkIos") }.configureEach {
+    dependsOn("copyDatabaseToIosResources")
+}
+
+sqldelight {
+    databases {
+        create("HafsDatabase") {
+            packageName.set("org.example.database")
+            srcDirs.setFrom("src/commonMain/sqldelight")
         }
     }
 }

@@ -3,6 +3,7 @@ package org.example.project
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +19,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.style.TextDirection
 import org.jetbrains.compose.resources.Font
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import sqldelightproject.composeapp.generated.resources.Res
 import sqldelightproject.composeapp.generated.resources.hafs_smart_08
@@ -28,9 +30,12 @@ fun App(viewModel: DemoViewModel) {
     MaterialTheme {
         val ayas by viewModel.state.collectAsState()
         Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(
-                rememberScrollState()
-            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp)
+                .verticalScroll(
+                    rememberScrollState()
+                ),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
